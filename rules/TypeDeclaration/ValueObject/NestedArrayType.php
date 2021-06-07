@@ -12,7 +12,7 @@ final class NestedArrayType
     public function __construct(
         private Type $type,
         private int $arrayNestingLevel,
-        private ?Type $keyType = null
+        private ?Type $type = null
     ) {
     }
 
@@ -28,6 +28,6 @@ final class NestedArrayType
 
     public function getKeyType(): Type
     {
-        return $this->keyType ?: new MixedType();
+        return $this->type ?: new MixedType();
     }
 }
