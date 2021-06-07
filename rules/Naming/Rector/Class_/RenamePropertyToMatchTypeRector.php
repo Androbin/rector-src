@@ -11,6 +11,7 @@ use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Property;
+use PHPStan\Type\ObjectType;
 use Rector\Core\Rector\AbstractRector;
 use Rector\Core\ValueObject\MethodName;
 use Rector\Core\ValueObject\PhpVersionFeature;
@@ -151,6 +152,13 @@ CODE_SAMPLE
                 return;
             }
 
+            if ($this->nodeTypeResolver->isObjectTypes($param->type, [
+                new ObjectType('PhpParser\Node'),
+                new ObjectType('PHPStan\Type\Type'),
+            ])) {
+                continue;
+            }
+
             $desiredPropertyNames[$key] = $desiredPropertyName;
         }
 
@@ -168,7 +176,11 @@ CODE_SAMPLE
             if (in_array($key, $keys, true)) {
                 $currentName = $this->getName($param);
                 $desiredPropertyName = $desiredPropertyNames[$key];
-                $this->propertyFetchRenamer->renamePropertyFetchesInClass($classLike, $currentName, $desiredPropertyName);
+                $this->propertyFetchRenamer->renamePropertyFetchesInClass(
+                    $classLike,
+                    $currentName,
+                    $desiredPropertyName
+                );
                 $param->var->name = $desiredPropertyName;
             }
         }
